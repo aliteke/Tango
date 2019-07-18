@@ -34,6 +34,7 @@ class Node:
         print "[+] Total neighbours of node: %d" % len(self.neighbours)
         return {'msg': '%d' % len(self.neighbours) + ' nodes added as neighbours'}
 
+
 """
     def attach_transaction(self, transaction, confirmed_transactions):
         if self.is_valid_transaction(transaction):

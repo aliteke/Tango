@@ -5,16 +5,15 @@ from flask import send_file
 import networkx as nx
 import matplotlib.pyplot as plt
 import os
+import sys
 
 # custom classes
 from lib.node import Node
 from lib.util import Util
-# from lib.transaction import TransactionEncoder
 
 # Instantiate our Node
 # Instantiate Tangle
 app = Flask(__name__)
-# app.json_encoder = TransactionEncoder
 utils = Util()
 
 print "[+] Node object is being created."
@@ -111,5 +110,13 @@ def hello():
 if __name__ == '__main__':
 	# reload each time a code change happens (ali)
 	# app.debug = True
-	print "[+] In main function, starting flask app on port 4001, host 0.0.0.0"
-	app.run(host='0.0.0.0', port=4001)
+
+	if not len(sys.argv) >= 1:
+		print "[-] ip and port number are required to run this node.\n " \
+			  "$ python runNode.py <ip-address> <portnumber>"
+		exit
+	ip = sys.argv[1]
+	port = sys.argv[2]
+
+	print "[+] In main function, starting flask app on host: %s, port: %s" % (ip, port)
+	app.run(host=ip, port=int(port))
