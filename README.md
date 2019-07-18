@@ -1,9 +1,10 @@
 # Tango Implementation<sup>*</sup>
 
 ### How to run and interact with a Node:
-==Notes==
 
-runNode.py is the main program for this simple IOTA 
+* `runNode.py` is the main python file. Can be run by; `python runNode.py`. It starts a web server on localhost:4001 using Python Flask web framework. 
+
+	* To run multiple nodes on the same computer, you need to change the port number.
 
 * To create a new Transaction, send a POST request to the node, providing ip:port and transaction as POST request parameters as follows,
 (i.e: sender address, receivers address, value)
