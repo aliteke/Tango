@@ -1,5 +1,4 @@
-# Tango Implementation [^1] 
-[^1]: (Forked from SimpleIOTA, https://github.com/leewaygroups/simpleIOTA/ )
+# Tango Implementation [<sup>1</sup>] (#)
 
 ### How to run and interact with a Node:
 ==Notes==
@@ -65,3 +64,4 @@ runNode.py is the main program for this simple IOTA
 
 * Consider large weight attack: This is a threat when large weight is used as a basis for tips selection in the tip selection algorithm.
 
+#### <sup>1</sup> Forked from SimpleIOTA (ttps://github.com/leewaygroups/simpleIOTA/)
