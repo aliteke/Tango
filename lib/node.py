@@ -1,31 +1,67 @@
-
-from random import randint
-from threading import Timer
-from lib.util import Util     
+from lib.util import Util
 from lib.wallet import Wallet
-from lib.transaction import Transaction
+from lib.tangle import Tangle
 
 utils = Util()
 
-class Node():
+
+class Node:
     def __init__(self, seed, *args):
         self.seed = seed
         self.wallet = Wallet(utils.hash(str(self.seed)))
         self.neighbours = set()
-        self.DAG = {}
 
-        root_transaction = Transaction('0000', 'root', 25000000000)        
-        self.attach_transaction(root_transaction, ['root'])
+        ####
+        # self.DAG = {}
+        # root_transaction = Transaction('0000', 'root', 25000000000)        
+        # self.attach_transaction(root_transaction, ['root'])
+        self.tangle = Tangle()
 
-    def proof_of_work(self, str_input):
-        proof = 0
-        while self.is_valid_proof(str_input, proof) is False:
-            proof +=1
-        return proof
+    def sync_neighbour(self):
+        #TODO: search for neighbour and return a Tangle
+        pass
 
-    def is_valid_proof(self, str_input, proof):
-        result = utils.hash(str_input + str(proof))
-        return result.count("00") >= 2 and result[-4:]=="0000"        
+    # Sample input JSON data;
+    # {"neighbours": [{"ip": "localhost", "port": 8080}, {"ip": "192.168.1.2", "port": 1234}]}
+    def register_neighbours(self, jsondata):
+        listofneighours = jsondata["neighbours"]
+        print "[+] Registering %d neighbours." % len(listofneighours)
+
+        # https://stackoverflow.com/questions/34097959/add-a-dictionary-to-a-set-with-union
+        for n in listofneighours:
+            # for each new neighbour, add tuples like (("ip": "192.168.1.2"), ("port": 8080))
+            self.neighbours.add(tuple(n.items()))
+        print "[+] Total neighbours of node: %d" % len(self.neighbours)
+        return {'msg': '%d' % len(self.neighbours) + ' nodes added as neighbours'}
+
+"""
+    def attach_transaction(self, transaction, confirmed_transactions):
+        if self.is_valid_transaction(transaction):
+            x = utils.str_join([transaction.time_stamp, transaction.pow, transaction.tnx['sending_addr'], transaction.tnx['receiving_addr'], transaction.tnx['value']])
+            transaction.key = utils.hash(x)
+            
+            for trans in confirmed_transactions:
+                transaction.pre_transactions.add(trans)
+
+            self.DAG[transaction.key] = transaction
+
+            # switch transaction state to revealed after 30 secs.
+            # Timer(30, lambda: self.reveal(transaction), None).start()
+            Timer(30, self.reveal, [transaction]).start()
+
+            return {'msg': 'Transaction successful'}
+
+        return {'msg': 'invalid transaction. Attachment failed'}
+
+    def is_valid_transaction(self, transaction):
+        # TODO: implement transaction validation logic
+        return True
+
+    def reveal(self, transaction):
+        transaction.state = 1
+        print("[+] transaction (t.key: %s) is revealed " % transaction.key)
+"""
+""" # moved to tangle.py
 
     def select_tips(self):
         available_transactions = []
@@ -41,7 +77,10 @@ class Node():
                 selected_transactions.append(available_transactions[randint(0, len(available_transactions)-1)].key)
 
         return selected_transactions
-    
+"""
+
+""" # moved to tangle.py
+
     def make_transaction(self, receiving_addr, value):
         '''
             1. Pick at least two transactions in Tangle to confirm
@@ -54,7 +93,7 @@ class Node():
 
         if len(confirmed_transactions) >= 2:
             proof_of_work = self.proof_of_work(''.join(confirmed_transactions))
-            new_transaction  = Transaction(
+            new_transaction = Transaction(
                 self.wallet.generate_address(),
                 receiving_addr,                 
                 value
@@ -63,6 +102,9 @@ class Node():
             return self.attach_transaction(new_transaction, confirmed_transactions)
 
         return {'msg': 'transaction failed'}
+
+
+    # moved to tangle.py
 
     def confirm_transactions(self):
         '''
@@ -86,46 +128,4 @@ class Node():
         '''
 
         return self.select_tips()
-    
-    def sync_neighbour(self):
-        #TODO: search for neighbour and return a Tangle
-        pass
-
-    def register_neighbours(self, neighbours):
-        for ip in neighbours:
-            self.neighbours.add(neighbours[ip])
-        return None
-
-    def attach_transaction(self, transaction, confirmed_transactions):
-        if self.is_valid_transaction(transaction):
-            transaction.key = utils.hash(utils.str_join([
-                transaction.time_stamp, 
-                transaction.pow, 
-                transaction.tnx['sending_addr'],
-                transaction.tnx['receiving_addr'],
-                transaction.tnx['value'] 
-            ]))
-            
-            for trans in confirmed_transactions:
-                transaction.pre_transactions.add(trans)
-
-            self.DAG[transaction.key] = transaction
-
-            # switch transaction state to revealed after 30 secs.
-            Timer(30, lambda: self.reveal(transaction), None).start()
-
-            return {'msg': 'ransaction successful'}
-
-        return {'msg': 'invalid transaction. Attachment failed'}
-
-    def is_valid_transaction(self, transaction):
-        # TODO: implement transaction validation logic
-        return True
-
-    def reveal(self, transaction):
-        transaction.state = 1
-        print("transaction revealed")
-        
-
-
-        
+"""

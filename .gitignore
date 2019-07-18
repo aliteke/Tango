@@ -3,3 +3,6 @@ node_modules/
 __pycache__/
 .vscode/
 .pylintrc
+.idea/
+lib/*.pyc
+Graph.png

@@ -1,14 +1,20 @@
 # import requests
 # from uuid import uuid4
 from flask import Flask, jsonify, request
+from flask import send_file
+import networkx as nx
+import matplotlib.pyplot as plt
+import os
 
 # custom classes
 from lib.node import Node
 from lib.util import Util
+# from lib.transaction import TransactionEncoder
 
 # Instantiate our Node
 # Instantiate Tangle
 app = Flask(__name__)
+# app.json_encoder = TransactionEncoder
 utils = Util()
 
 print "[+] Node object is being created."
@@ -24,29 +30,80 @@ def register_new_node():
 
 @app.route('/transactions/new', methods=['POST'])
 def make_transaction():
-	request_params = request.get_json()
-	response = node.make_transaction(request_params['receiving_addr'], request_params['value'])
+	# request_params = request.get_json(force=True)
+	response = node.tangle.make_transaction(request.form.get('sndr_addr'),
+											request.form.get('rcvr_addr'),
+											request.form.get('value'))
 	return jsonify(response), 201
 
 
 @app.route('/wallet/balance', methods=['POST'])
 def wallet_balance():
-	return "wallets and balances of this node"
+	address = request.form.get('address')
+	if address in node.wallet.getWalletAddresses():
+		return "[+] Wallet balance for address [%s] is: %s " % (address, node.wallet.getbalance(address))
+	else:
+		return "[-] This node's wallet has no such address: %s" % address
+
+
+@app.route('/wallet/addresses', methods=['GET'])
+def wallet_addresses():
+	return "[+] Wallets addresses of this node: " + str(node.wallet.getWalletAddresses().keys())
 
 
 @app.route('/dag', methods=['GET'])
 def show_DAG():
-	print node.DAG
-	return jsonify(node.DAG.keys()), 201
+	# print node.tangle.DAG.keys()
+	serializable_format = {}
+	for (k, v) in node.tangle.DAG.items():
+		serializable_format.update({k: v.gettransactionasdict()})
+
+	return jsonify(serializable_format), 201
+
+	# return jsonify(node.tangle.DAG), 201
 	# problem with the original code is that, DAG dictionary has Transaction Objects as values, and those are not
-	# serializable as JSON objects. Maybe, find a way to make class Transaction JSON serialiazible (encoding)
-	#return jsonify(node.DAG), 201
+	# serializable as JSON objects. Maybe, find a way to make class Transaction JSON serializable (encoding)
+	# return jsonify(node.DAG), 201
+
+
+@app.route('/dag/png', methods=['GET'])
+def get_DAG_as_png():
+	serializable_format = {}
+	for (k, v) in node.tangle.DAG.items():
+		serializable_format.update({k: v.gettransactionasdict()})
+
+	tngl = nx.DiGraph()
+
+	for n in serializable_format:
+		print "[+] node: " + n + ", edge: " + str(serializable_format[n]['pre_transactions'])
+		for x in serializable_format[n]['pre_transactions']:
+			tngl.add_edge(n, x)
+
+	lbls = {}
+	for k in tngl.nodes().keys():
+		lbls.update({k: k[0:3]})
+	pos = nx.spring_layout(tngl)  # positions for all nodes
+	nx.draw_networkx_nodes(tngl, pos, node_size=700)
+	nx.draw_networkx_labels(tngl, pos, labels=lbls, font_size=8, font_family='sans-serif')
+	nx.draw_networkx_edges(tngl, pos, width=2)
+	# nx.draw(tngl)
+	# plt.show(block=False)
+
+	if "Graph.png" in os.listdir("."):
+		print "[+] Deleting Graph.png"
+		os.remove("Graph.png")
+
+	plt.axis('off')
+	plt.savefig("Graph.png", format="PNG")
+	plt.clf()
+
+	return send_file("Graph.png", mimetype='image/png')
 
 
 @app.route('/hello', methods=['GET'])
 def hello():
-	print "test hello API endpoint"
-	return "test hello API endpoint"
+	print "[+] response: test hello API endpoint"
+	return "test hello API endpoint\n"
 
 # print "[+] __name__: " + __name__
 

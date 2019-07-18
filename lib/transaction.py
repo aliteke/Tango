@@ -1,10 +1,8 @@
-
 import time
-from threading import Timer
 
-class Transaction():
+
+class Transaction:
     def __init__(self, sending_addr, receiving_addr, value, *args):
-        
         # state 0: hidden, state 1: revealed
         self.state = 0
         self.weight = 1
@@ -12,8 +10,8 @@ class Transaction():
         self.pow = None
         self.time_stamp = time.time()
         self.tnx = {
-            'sending_addr': sending_addr,
-            'receiving_addr': receiving_addr,
+            'sndr_addr': sending_addr,
+            'rcvr_addr': receiving_addr,
             'value': value 
         }
 
@@ -29,7 +27,27 @@ class Transaction():
     def height(self):
         pass
 
-    def cummulative_weight(self):
+    def depth(self):
         pass
 
-        
+    def own_weight(self):
+        return self.weight
+
+    def cumulative_weight(self):
+        pass
+
+    def gettransactionasdict(self):
+        x = self.__dict__
+        x['pre_transactions'] = list(x['pre_transactions'])
+        return x
+
+"""
+class TransactionEncoder(JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Transaction):
+            x = o.__dict__
+            x['pre_transactions'] = list(x['pre_transactions'])
+            return x
+        else:
+            return json.JSONEncoder.default(self, o)
+"""

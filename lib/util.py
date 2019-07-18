@@ -1,10 +1,10 @@
-
 import hashlib
 from uuid import uuid4
 
-class Util():
+
+class Util:
     def __init__(self, *args):
-         pass
+        pass
 
     def hash(self, str_input):
         return hashlib.sha256(str_input.encode()).hexdigest()
