@@ -11,14 +11,7 @@ import sys
 from lib.node import Node
 from lib.util import Util
 
-# Instantiate our Node
-# Instantiate Tangle
 app = Flask(__name__)
-utils = Util()
-
-print "[+] Node object is being created."
-node = Node(utils.unique_gen())
-
 
 @app.route('/node/register_neighbours', methods=['POST'])
 def register_new_node():
@@ -103,14 +96,28 @@ def hello():
 # print "[+] __name__: " + __name__
 
 
+# TODO:
+# (1) When we start multiple Nodes, they both start from Genesis.
+# 	 -> We need to specify the second node (or later ones) that it is not Genesis node, should not create a tangle
+# 	 -> Sequential nodes, can contact their neighbours (if they have one)
+# 	 -> or read from a JSON file for the current state of the tangle
 if __name__ == '__main__':
 	# reload each time a code change happens (ali)
 	# app.debug = True
 
-	if not len(sys.argv) >= 1:
-		print "[-] ip and port number are required to run this node.\n " \
+	if len(sys.argv) <= 1:
+		print "[-] ip and port number are required to run this node.\n" \
 			  "$ python runNode.py <ip-address> <portnumber>"
-		exit
+		sys.exit(0)
+
+	# Instantiate our Node
+	# Instantiate Tangle
+
+	utils = Util()
+
+	print "[+] Node object is being created."
+	node = Node(utils.unique_gen())
+
 	ip = sys.argv[1]
 	port = sys.argv[2]
 
