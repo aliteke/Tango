@@ -2,7 +2,7 @@
 
 ### How to run and interact with a Node:
 
-* `runNode.py` is the main python file. Can be run by; `python runNode.py`. It starts a web server on localhost:4001 using Python Flask web framework. 
+* `runNode.py` is the main python file. Can be run by; `python runNode.py <hostip> <port>`. It starts a web server on <host>:<port> using Python Flask web framework. 
 
 	* To run multiple nodes on the same computer, you need to change the port number.
 

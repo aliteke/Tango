@@ -52,24 +52,20 @@ def wallet_addresses():
 
 @app.route('/dag', methods=['GET'])
 def show_DAG():
-	# print node.tangle.DAG.keys()
-	serializable_format = {}
-	for (k, v) in node.tangle.DAG.items():
-		serializable_format.update({k: v.gettransactionasdict()})
-
+	serializable_format = node.getTangleAsJSONdict()
+	node.writeTangleToJSONfile()
 	return jsonify(serializable_format), 201
 
 	# return jsonify(node.tangle.DAG), 201
-	# problem with the original code is that, DAG dictionary has Transaction Objects as values, and those are not
-	# serializable as JSON objects. Maybe, find a way to make class Transaction JSON serializable (encoding)
+	# problem with the original code was that, DAG dictionary has Transaction Objects as values,
+	# and those are not serializable as JSON objects.
 	# return jsonify(node.DAG), 201
 
 
 @app.route('/dag/png', methods=['GET'])
 def get_DAG_as_png():
-	serializable_format = {}
-	for (k, v) in node.tangle.DAG.items():
-		serializable_format.update({k: v.gettransactionasdict()})
+	serializable_format = node.getTangleAsJSONdict()
+	node.writeTangleToJSONfile()
 
 	tngl = nx.DiGraph()
 

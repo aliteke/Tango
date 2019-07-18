@@ -1,6 +1,7 @@
 from lib.util import Util
 from lib.wallet import Wallet
 from lib.tangle import Tangle
+import json
 
 utils = Util()
 
@@ -17,10 +18,6 @@ class Node:
         # self.attach_transaction(root_transaction, ['root'])
         self.tangle = Tangle()
 
-    def sync_neighbour(self):
-        #TODO: search for neighbour and return a Tangle
-        pass
-
     # Sample input JSON data;
     # {"neighbours": [{"ip": "localhost", "port": 8080}, {"ip": "192.168.1.2", "port": 1234}]}
     def register_neighbours(self, jsondata):
@@ -32,8 +29,35 @@ class Node:
             # for each new neighbour, add tuples like (("ip": "192.168.1.2"), ("port": 8080))
             self.neighbours.add(tuple(n.items()))
         print "[+] Total neighbours of node: %d" % len(self.neighbours)
+
+        self.sync_neighbour()
+
         return {'msg': '%d' % len(self.neighbours) + ' nodes added as neighbours'}
 
+    def sync_neighbour(self):
+        # TODO: for each ip:port pair in the self.neighbours:
+        #       - Check if they are up/alive (maybe ping first)
+        #       - if they are up, ask them for their Tangle.
+        print "[+] Syncing with Neighbours..."
+        pass
+
+    def writeTangleToJSONfile(self):
+        filename = "db/tangledb.json"
+        with open(filename, 'w') as f:
+            json.dump(self.getTangleAsJSONdict(), f)
+
+    def readTangleFromJSONfile(self):
+        filename = "db/tangledb.json"
+        with open(filename, 'r') as f:
+            tangleJSON = json.load(f)
+        return tangleJSON
+
+    def getTangleAsJSONdict(self):
+        serializable_format = {}
+        for (k, v) in self.tangle.DAG.items():
+            serializable_format.update({k: v.gettransactionasdict()})
+
+        return serializable_format
 
 """
     def attach_transaction(self, transaction, confirmed_transactions):
