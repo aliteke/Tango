@@ -2,7 +2,7 @@
 
 ### How to run and interact with a Node:
 
-* `runNode.py` is the main python file. Can be run by; `python runNode.py <hostip> <port>`. It starts a web server on <host>:<port> using Python Flask web framework. 
+* `runNode.py` is the main python file. Can be run by; `python runNode.py <hostip> <port>`. It starts a web server on host:port using Python Flask web framework. 
 
 	* To run multiple nodes on the same computer, you need to change the port number.
 
@@ -15,24 +15,30 @@
 
 
 * We can check the balance of a wallet address, from a node. For this, send a POST request with addrees=XYZ parameter like this;
+
     ` $ curl -v localhost:4001/wallet/balance -X POST -d "address=0123"`
 
 
 * You can list all the addresses of the wallet of a specific Node like this;
+
     `$ curl -v localhost:4001/wallet/addresses -X GET`
 
 
 * Get the current view of current node's Tangle in JSON format, send the following GET request
+
     `$ curl localhost:4001/dag -X GET`
 
 
 * To get a PNG image of the current node's Tangle, send the following GET request,
+
     `$ curl localhost:4001/dag/png -X GET --output tangle.png ; eog --fullscreen tangle.png &`
     * TODO: add a printed timestamp on the PNG file
 
 
 * We can register a new neighbour to this node.
+
     `$ curl -v localhost:4001/node/register_neighbours -H "Content-Type: application/json" -X POST -d '{"neighbours":[{"ip":"localhost", "port":"8080"}, {"ip":"192.168.1.2", "port":"1234"}]}'`
+    
     * In the above POST request, we send a JSON string, which has an list item "neighbours". This list has (ip, port) pairs for each neighbour we are trying to register. 
 
 
